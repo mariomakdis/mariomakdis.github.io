@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MARIO MAKDIS</title>
+    <!-- Load GSAP from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+    <!-- Google Font for a modern vibe -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="animated-text">MARIO MAKDIS</h1>
+        <p class="animated-subtext">WORK IN PROGRESS</p>
+    </div>
+
+    <script>
+        // Split the heading text into individual letters wrapped in spans
+        const splitText = (element) => {
+            const text = element.textContent;
+            const characters = text.split('');
+            element.innerHTML = characters
+                .map((char) => `<span class="letter">${char}</span>`)
+                .join('');
+        };
+
+        // Select elements
+        const heading = document.querySelector('.animated-text');
+        const subtext = document.querySelector('.animated-subtext');
+
+        // Split the heading text for per-letter animations
+        splitText(heading);
+
+        // Create a timeline to animate the heading letters and the subtext
+        const tl = gsap.timeline();
+        tl.from(".letter", {
+            opacity: 0,
+            y: 50,
+            duration: 0.8,
+            stagger: 0.05,
+            ease: "power2.out"
+        })
+            .from(subtext, {
+                opacity: 0,
+                y: 20,
+                duration: 0.8,
+                ease: "power2.out"
+            }, "-=0.4");
+
+        // Function to trigger a glitch effect on the heading
+        function glitchEffect() {
+            gsap.to(".animated-text", {
+                duration: 0.1,
+                x: gsap.utils.random(-5, 5),
+                y: gsap.utils.random(-5, 5),
+                repeat: 3,
+                yoyo: true,
+                ease: "power1.inOut",
+                onComplete: () => {
+                    gsap.to(".animated-text", { duration: 0.1, x: 0, y: 0 });
+                }
+            });
+        }
+
+        // Schedule glitch effect every 3 seconds after the initial animation
+        gsap.delayedCall(3, function loopGlitch() {
+            glitchEffect();
+            gsap.delayedCall(3, loopGlitch);
+        });
+
+        // Add a continuous, subtle pulsation to the heading text
+        gsap.to(".animated-text", {
+            scale: 1.02,
+            duration: 2,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut"
+        });
+
+        // Add a floating animation for the subtext
+        gsap.to(".animated-subtext", {
+            y: -5,
+            duration: 2,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut"
+        });
+    </script>
+</body>
+
+</html>
