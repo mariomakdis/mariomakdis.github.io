@@ -96,7 +96,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function openModal(project) {
         document.getElementById('modal-title').textContent = project.title;
         document.getElementById('modal-description').textContent = project.description;
-        document.getElementById('modal-url').href = project.url;
+        
+        const modalUrl = document.getElementById('modal-url');
+        if (project.url) {
+            modalUrl.href = project.url;
+            modalUrl.style.display = 'inline-block';
+        } else {
+            modalUrl.style.display = 'none';
+        }
         
         const imageContainer = document.querySelector('.modal-images');
         imageContainer.innerHTML = project.images.map(img => `<img src="${img}" alt="${project.title} screenshot">`).join('');
@@ -176,10 +183,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // Header text animation
+    // Header text animation - UPDATED LOGIC
     const heading = document.querySelector('.animated-text');
     const text = heading.textContent;
-    heading.innerHTML = text.split('').map(char => `<span class="letter">${char}</span>`).join('');
+    heading.innerHTML = text.split(' ').map(word => 
+        `<span class="word">${word.split('').map(char => 
+            `<span class="letter">${char}</span>`
+        ).join('')}</span>`
+    ).join(' ');
+
     gsap.from(".letter", {
         opacity: 0, y: 50, duration: 0.8, stagger: 0.05, ease: "power2.out"
     });
