@@ -59,11 +59,17 @@ section {
 }
 
 .animated-text {
-  font-size: clamp(2rem, 10vw, 6rem);
+  font-size: clamp(3rem, 10vw, 6rem);
   font-weight: 700;
   letter-spacing: 3px;
   color: var(--primary-color);
   text-shadow: 0 0 15px var(--shadow-color);
+  line-height: 1.2;
+}
+
+.animated-text .word {
+  display: inline-block;
+  /* Prevents words from breaking */
 }
 
 .animated-text .letter {
@@ -545,5 +551,11 @@ footer p {
 
   .modal-body {
     flex-direction: column;
+  }
+}
+
+@media(max-width: 480px) {
+  .animated-text {
+    font-size: clamp(2.5rem, 12vw, 4rem);
   }
 }
