@@ -520,6 +520,8 @@ footer p {
   transform: translateY(-3px);
 }
 
+/* css/style.css */
+
 /* --- RESPONSIVE DESIGN --- */
 @media(max-width: 768px) {
   .section-title {
@@ -552,10 +554,42 @@ footer p {
   .modal-body {
     flex-direction: column;
   }
+
+  /* ADD THIS NEW RULE FOR THE NAVIGATION */
+  .main-nav ul {
+    overflow-x: auto;
+    /* Enable horizontal scrolling */
+    flex-wrap: nowrap;
+    /* Keep all links on a single line */
+    justify-content: flex-start;
+    /* Align items to the left for scrolling */
+    padding: 0 20px;
+    /* Add some space on the sides */
+
+    /* --- Optional: Hide the scrollbar for a cleaner look --- */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
+
+  .main-nav ul::-webkit-scrollbar {
+    display: none;
+    /* Hide scrollbar for Chrome, Safari and Opera */
+  }
 }
 
+/* MODIFIED SECTION FOR SMALLER MOBILE SCREENS */
 @media(max-width: 480px) {
   .animated-text {
-    font-size: clamp(2.5rem, 12vw, 4rem);
+    /* Increased the viewport width scaling and min/max values */
+    font-size: clamp(3.5rem, 18vw, 6rem);
+    /* Tightened letter spacing for larger font on small screens */
+    letter-spacing: 1px;
+  }
+
+  .animated-subtext {
+    /* Added a rule to make the subtext larger on mobile as well */
+    font-size: clamp(1.2rem, 6vw, 2rem);
   }
 }
