@@ -8,6 +8,9 @@ document.addEventListener('DOMContentLoaded', () => {
         projects
     } = portfolioData;
 
+    const spaceEmojis = ['🪐', '🚀', '🧑‍🚀', '✨', '☄️', '🌟'];
+
+
     // --- POPULATE HTML SECTIONS ---
 
     // Populate Header
@@ -239,60 +242,137 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    /* js/main.js */
+
     // --- PARTICLE BACKGROUND ---
     const canvas = document.getElementById('particle-canvas');
     const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
 
     let particlesArray;
+    const numParticles = 200; // Reduced particle count for a cleaner look
+    const chanceOfSpecial = 0.015; // 1.5% chance for a particle to be a spaceship
+    const specialEmojis = ['🚀', '🛰️', '🛸', '☄️', '🪐', '👽', '🧑‍🚀'];
+
+    function setupCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    setupCanvas();
 
     class Particle {
-        constructor(x, y, directionX, directionY, size, color) {
-            this.x = x; this.y = y; this.directionX = directionX;
-            this.directionY = directionY; this.size = size; this.color = color;
+        constructor() {
+            // Decide if the particle is special or a star
+            this.isSpecial = Math.random() < chanceOfSpecial;
+
+            if (this.isSpecial) {
+                this.initSpecial();
+            } else {
+                this.initStar();
+            }
         }
-        draw() {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
-            ctx.fillStyle = 'rgba(255, 215, 0, 0.4)'; // Gold particle color
-            ctx.fill();
+
+        // --- Star Methods ---
+        initStar() {
+            const speedFactor = 150; // Larger number = slower expansion
+            this.depth = 3; // Increased depth for more parallax
+            this.x = (Math.random() - 0.5) * canvas.width * 0.5; // Start closer to center
+            this.y = (Math.random() - 0.5) * canvas.height * 0.5;
+            this.z = Math.random() * this.depth;
+            this.update = () => {
+                // Move radially from the center, faster when closer (higher z)
+                this.x += this.x / (this.z * speedFactor);
+                this.y += this.y / (this.z * speedFactor);
+
+                // Reset if it goes way off-screen
+                if (this.x < -canvas.width / 1.5 || this.x > canvas.width / 1.5 ||
+                    this.y < -canvas.height / 1.5 || this.y > canvas.height / 1.5) {
+                    this.initStar();
+                }
+            };
+            this.draw = () => {
+                const radius = (1 - this.z / this.depth) * 1.5;
+                const alpha = (1 - this.z / this.depth);
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 215, 0, ${alpha})`;
+                ctx.fill();
+            };
         }
-        update() {
-            if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
-            if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
-            this.x += this.directionX; this.y += this.directionY;
-            this.draw();
+
+        // --- Special Particle Methods ---
+        initSpecial() {
+            const speed = Math.random() * 1.5 + 1.5; // Slightly slower speed
+            this.emoji = specialEmojis[Math.floor(Math.random() * specialEmojis.length)];
+            
+            // Randomly choose an edge to spawn from (0:right, 1:left, 2:bottom, 3:top)
+            const side = Math.floor(Math.random() * 4);
+
+            if (side === 0) { // From right
+                this.x = canvas.width / 2 + 50;
+                this.y = (Math.random() - 0.5) * canvas.height;
+                this.vx = -speed; this.vy = 0;
+            } else if (side === 1) { // From left
+                this.x = -canvas.width / 2 - 50;
+                this.y = (Math.random() - 0.5) * canvas.height;
+                this.vx = speed; this.vy = 0;
+            } else if (side === 2) { // From bottom
+                this.x = (Math.random() - 0.5) * canvas.width;
+                this.y = canvas.height / 2 + 50;
+                this.vx = 0; this.vy = -speed;
+            } else { // From top
+                this.x = (Math.random() - 0.5) * canvas.width;
+                this.y = -canvas.height / 2 - 50;
+                this.vx = 0; this.vy = speed;
+            }
+
+            this.update = () => {
+                this.x += this.vx;
+                this.y += this.vy;
+                // Reset if it flies too far off-screen
+                if (this.x < -canvas.width || this.x > canvas.width ||
+                    this.y < -canvas.height || this.y > canvas.height) {
+                    this.initSpecial();
+                }
+            };
+            this.draw = () => {
+                ctx.globalAlpha = 1;
+                ctx.font = '30px Arial';
+                ctx.fillText(this.emoji, this.x, this.y);
+            };
         }
     }
 
     function init() {
         particlesArray = [];
-        let numberOfParticles = (canvas.height * canvas.width) / 9000;
-        for (let i = 0; i < numberOfParticles; i++) {
-            let size = (Math.random() * 2) + 1;
-            let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
-            let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
-            let directionX = (Math.random() * .4) - .2;
-            let directionY = (Math.random() * .4) - .2;
-            particlesArray.push(new Particle(x, y, directionX, directionY, size));
+        for (let i = 0; i < numParticles; i++) {
+            particlesArray.push(new Particle());
         }
     }
 
     function animateParticles() {
-        requestAnimationFrame(animateParticles);
-        ctx.clearRect(0, 0, innerWidth, innerHeight);
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        ctx.fillStyle = 'rgba(18, 18, 18, 0.6)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.save();
+        ctx.translate(centerX, centerY);
+
         for (let i = 0; i < particlesArray.length; i++) {
             particlesArray[i].update();
+            particlesArray[i].draw();
         }
+        
+        ctx.restore();
+        requestAnimationFrame(animateParticles);
     }
-    
+
     init();
     animateParticles();
 
     window.addEventListener('resize', () => {
-        canvas.width = innerWidth;
-        canvas.height = innerHeight;
+        setupCanvas();
         init();
     });
 });
